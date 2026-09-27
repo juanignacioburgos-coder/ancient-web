@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tierra Antigua 3D | Deriva Continental y Paleobiología</title>
+    <meta name="description" content="Globo terráqueo 3D interactivo que visualiza la deriva continental a través del tiempo geológico (PALEOMAP), con fauna, flora, atmósfera y yacimientos de fósiles." />
+    
+    <!-- Open Graph / Meta -->
+    <meta property="og:title" content="Tierra Antigua 3D - Deriva Continental y Paleobiología" />
+    <meta property="og:description" content="Explora 750 millones de años de historia terrestre, tectónica de placas y evolución biológica en 3D con Three.js." />
+    <meta property="og:type" content="website" />
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='46' fill='%231976d2'/><path d='M25 45 Q35 30 55 35 T85 50 T65 75 T35 70 Z' fill='%234caf50'/></svg>" />
+  </head>
+  <body>
+    <div id="app">
+      <!-- 3D Canvas Viewport -->
+      <div id="globe-container"></div>
+
+      <!-- Top Navigation & HUD Header -->
+      <header class="app-header glass-panel">
+        <div class="brand">
+          <div class="brand-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="2" y1="12" x2="22" y2="12"></line>
+              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+            </svg>
+          </div>
+          <div class="brand-text">
+            <h1 class="brand-title">Tierra Antigua 3D</h1>
+            <span class="brand-subtitle">PaleoAtlas Geológico y Tectónico</span>
+          </div>
+        </div>
+
+        <!-- Period Quick Jump Select -->
+        <div class="header-center">
+          <div class="quick-jump-box">
+            <label for="period-select" class="sr-only">Seleccionar periodo</label>
+            <select id="period-select" class="period-select" aria-label="Seleccionar periodo geológico">
+              <!-- Options populated dynamically from fauna_flora.json -->
+            </select>
+          </div>
+        </div>
+
+        <!-- Header Actions -->
+        <div class="header-actions">
+          <button id="btn-autorotate" class="icon-btn active" title="Alternar rotación automática del globo" aria-label="Rotación automática">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path>
+            </svg>
+          </button>
+          
+          <button id="btn-reset-cam" class="icon-btn" title="Restablecer vista centrada de la cámara" aria-label="Restablecer cámara">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon>
+            </svg>
+          </button>
+
+          <button id="btn-info" class="icon-btn" title="Información y metodología científica" aria-label="Información">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="16" x2="12" y2="12"></line>
+              <line x1="12" y1="8" x2="12.01" y2="8"></line>
+            </svg>
+          </button>
+
+          <button id="btn-fullscreen" class="icon-btn" title="Pantalla completa" aria-label="Pantalla completa">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+            </svg>
+          </button>
+        </div>
+      </header>
+
+      <!-- Sidebar Container for Paleobiology Data -->
+      <div id="sidebar-mount"></div>
+
+      <!-- Bottom Timeline Scrubber Container -->
+      <div id="timeline-mount"></div>
+
+      <!-- Modal About & Methodology -->
+      <dialog id="info-dialog" class="glass-dialog">
+        <div class="dialog-card">
+          <div class="dialog-header">
+            <h3>Metodología Científica y Tecnológica</h3>
+            <button id="btn-close-dialog" class="btn-close" aria-label="Cerrar modal">&times;</button>
+          </div>
+          <div class="dialog-body">
+            <h4>🌐 Reconstrucción Paleogeográfica (Deriva Continental)</h4>
+            <p>
+              Esta aplicación implementa un sistema discreto basado en hitos geológicos y cronoestratigráficos 
+              (snapshots tectónicos) inspirados en las reconstrucciones de referencia mundial del 
+              <strong>PALEOMAP Project (Dr. Christopher Scotese)</strong> y la <strong>Comisión Internacional de Estratigrafía (IUGS)</strong>.
+            </p>
+            <h4>⚛️ Proyección Esférica de Marcadores 3D</h4>
+            <p>
+              Los yacimientos y fósiles se proyectan sobre la esfera tridimensional calculando la transformación 
+              de coordenadas esféricas (latitud/longitud en grados convertidos a radianes) a coordenadas cartesianas 
+              $(x, y, z)$ según la fórmula física:
+            </p>
+            <div class="code-box">
+              <code>x = R · cos(lat) · cos(lon)<br>y = R · sin(lat)<br>z = -R · cos(lat) · sin(lon)</code>
+            </div>
+            <h4>🚀 Pila Tecnológica</h4>
+            <ul>
+              <li><strong>Motor 3D:</strong> Three.js (SphereGeometry, MeshStandardMaterial, OrbitControls con amortiguación).</li>
+              <li><strong>Transición de Texturas:</strong> Carga asíncrona no bloqueante con interpolación de opacidad suave (crossfade a 60 fps).</li>
+              <li><strong>Despliegue Continuo:</strong> GitHub Pages automatizado mediante GitHub Actions CI/CD.</li>
+            </ul>
+          </div>
+        </div>
+      </dialog>
+    </div>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
